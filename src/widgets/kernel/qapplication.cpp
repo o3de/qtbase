@@ -943,9 +943,9 @@ void QApplication::setStyleSheet(const QString& styleSheet)
             return; // there was no stylesheet before
         setStyle(styleSheetStyle->base);
     } else if (styleSheetStyle) { // style sheet update, just repolish
-        styleSheetStyle->repolish(qApp);
+        styleSheetStyle->setGlobalSheet(styleSheet);
     } else { // stylesheet set the first time
-        QStyleSheetStyle *newStyleSheetStyle = new QStyleSheetStyle(QApplicationPrivate::app_style);
+        QStyleSheetStyle *newStyleSheetStyle = new QStyleSheetStyle(QApplicationPrivate::app_style, styleSheet);
         QApplicationPrivate::app_style->setParent(newStyleSheetStyle);
         setStyle(newStyleSheetStyle);
     }

@@ -72,14 +72,15 @@ class QAbstractScrollArea;
 class QStyleSheetStylePrivate;
 class QStyleOptionTitleBar;
 
-class Q_AUTOTEST_EXPORT QStyleSheetStyle : public QWindowsStyle
+class Q_WIDGETS_EXPORT QStyleSheetStyle : public QWindowsStyle
 {
     typedef QWindowsStyle ParentStyle;
 
     Q_OBJECT
 public:
-    QStyleSheetStyle(QStyle *baseStyle);
+    QStyleSheetStyle(QStyle *baseStyle, const QString &globalSheet = QString());
     ~QStyleSheetStyle();
+    void setGlobalSheet(const QString &sheet);
 
     void drawComplexControl(ComplexControl cc, const QStyleOptionComplex *opt, QPainter *p,
                             const QWidget *w = nullptr) const override;
@@ -120,7 +121,7 @@ public:
     // These functions are called from QApplication/QWidget. Be careful.
     QStyle *baseStyle() const;
     void repolish(QWidget *widget);
-    void repolish(QApplication *app);
+    void repolishGlobalSheet();
 
     void unpolish(QWidget *widget) override;
     void unpolish(QApplication *app) override;
@@ -140,6 +141,7 @@ protected:
 
 private:
     int refcount;
+    QString globalSheet;
 
     friend class QRenderRule;
     int nativeFrameWidth(const QWidget *);

@@ -1621,14 +1621,14 @@ QVector<QCss::StyleRule> QStyleSheetStyle::styleRules(const QObject *obj) const
     }
     styleSelector.styleSheets += defaultSs;
 
-    if (!qApp->styleSheet().isEmpty()) {
+    if (!globalSheet.isEmpty()) {
         StyleSheet appSs;
         QHash<const void *, StyleSheet>::const_iterator appCacheIt = styleSheetCaches->styleSheetCache.constFind(qApp);
         if (appCacheIt == styleSheetCaches->styleSheetCache.constEnd()) {
-            QString ss = qApp->styleSheet();
+            QString ss = globalSheet;
             if (ss.startsWith(QLatin1String("file:///")))
                 ss.remove(0, 8);
-            parser.init(ss, qApp->styleSheet() != ss);
+            parser.init(ss, globalSheet != ss);
             if (Q_UNLIKELY(!parser.parse(&appSs)))
                 qWarning("Could not parse application stylesheet");
             appSs.origin = StyleSheetOrigin_Inline;
@@ -2757,8 +2757,9 @@ static void updateObjects(const QList<const QObject *>& objects)
 // The stylesheet style
 int QStyleSheetStyle::numinstances = 0;
 
-QStyleSheetStyle::QStyleSheetStyle(QStyle *base)
+QStyleSheetStyle::QStyleSheetStyle(QStyle *base, const QString &globalSheet)
     : QWindowsStyle(*new QStyleSheetStylePrivate), base(base), refcount(1)
+    , globalSheet(globalSheet)
 {
     ++numinstances;
     if (numinstances == 1) {
@@ -2773,6 +2774,15 @@ QStyleSheetStyle::~QStyleSheetStyle()
         delete styleSheetCaches;
     }
 }
+
+void QStyleSheetStyle::setGlobalSheet(const QString &sheet)
+{
+    if (globalSheet != sheet) {
+        globalSheet = sheet;
+        repolishGlobalSheet();
+    }
+}
+
 QStyle *QStyleSheetStyle::baseStyle() const
 {
     if (base)
@@ -2931,11 +2941,10 @@ void QStyleSheetStyle::repolish(QWidget *w)
     updateObjects(children);
 }
 
-void QStyleSheetStyle::repolish(QApplication *app)
+void QStyleSheetStyle::repolishGlobalSheet()
 {
-    Q_UNUSED(app);
     const QList<const QObject*> allObjects = styleSheetCaches->styleRulesCache.keys();
-    styleSheetCaches->styleSheetCache.remove(qApp);
+    styleSheetCaches->styleSheetCache.remove(qApp); // Could be any object, maybe even "this" or nullptr, we just need a object as key
     styleSheetCaches->styleRulesCache.clear();
     styleSheetCaches->hasStyleRuleCache.clear();
     styleSheetCaches->renderRulesCache.clear();
