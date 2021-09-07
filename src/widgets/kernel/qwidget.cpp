@@ -70,6 +70,7 @@
 #endif
 #include "qdebug.h"
 #include "private/qstylesheetstyle_p.h"
+#include "qproxystyle.h"
 #include "private/qstyle_p.h"
 #include "qfileinfo.h"
 #include "qscopeguard.h"
@@ -2532,6 +2533,19 @@ QString QWidget::styleSheet() const
     return d->extra->styleSheet;
 }
 
+static QStyleSheetStyle* styleSheetStyle(QStyle *style)
+{
+    if (!style)
+        return nullptr;
+
+    if (auto s = qobject_cast<QStyleSheetStyle*>(style))
+        return s;
+
+    if (auto proxy = qobject_cast<QProxyStyle*>(style))
+        return styleSheetStyle(proxy->baseStyle());
+    return nullptr;
+}
+
 void QWidget::setStyleSheet(const QString& styleSheet)
 {
     Q_D(QWidget);
@@ -2539,8 +2553,15 @@ void QWidget::setStyleSheet(const QString& styleSheet)
         return;
     d->createExtra();
 
-    QStyleSheetStyle *proxy = qt_styleSheet(d->extra->style);
     d->extra->styleSheet = styleSheet;
+    if (qApp->testAttribute(Qt::AA_ManualStyleSheetStyle)) {
+        QStyleSheetStyle *sheetStyle = styleSheetStyle(style());
+        if (sheetStyle)
+            sheetStyle->repolish(this);
+        return;
+    }
+
+    QStyleSheetStyle *proxy = qt_styleSheet(d->extra->style);
     if (styleSheet.isEmpty()) { // stylesheet removed
         if (!proxy)
             return;
@@ -2688,8 +2709,7 @@ void QWidgetPrivate::inheritStyle(bool repolish)
     QStyleSheetStyle *proxy = qt_styleSheet(extraStyle);
 
     if (!q->styleSheet().isEmpty()) {
-        Q_ASSERT(proxy);
-        if (repolish)
+        if (repolish && proxy)
         proxy->repolish(q);
         return;
     }

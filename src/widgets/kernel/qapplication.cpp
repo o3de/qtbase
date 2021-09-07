@@ -944,7 +944,7 @@ void QApplication::setStyleSheet(const QString& styleSheet)
         setStyle(styleSheetStyle->base);
     } else if (styleSheetStyle) { // style sheet update, just repolish
         styleSheetStyle->setGlobalSheet(styleSheet);
-    } else { // stylesheet set the first time
+    } else if (!qApp->testAttribute(Qt::AA_ManualStyleSheetStyle)) { // stylesheet set the first time
         QStyleSheetStyle *newStyleSheetStyle = new QStyleSheetStyle(QApplicationPrivate::app_style, styleSheet);
         QApplicationPrivate::app_style->setParent(newStyleSheetStyle);
         setStyle(newStyleSheetStyle);
@@ -1046,7 +1046,7 @@ void QApplication::setStyle(QStyle *style)
     QStyle *old = QApplicationPrivate::app_style; // save
 
 #ifndef QT_NO_STYLE_STYLESHEET
-    if (!QApplicationPrivate::styleSheet.isEmpty() && !qt_styleSheet(style)) {
+    if (!QApplicationPrivate::styleSheet.isEmpty() && !qt_styleSheet(style) && !qApp->testAttribute(Qt::AA_ManualStyleSheetStyle)) {
         // we have a stylesheet already and a new style is being set
         QStyleSheetStyle *newStyleSheetStyle = new QStyleSheetStyle(style);
         style->setParent(newStyleSheetStyle);
