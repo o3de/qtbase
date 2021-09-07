@@ -60,6 +60,7 @@
 #endif
 
 #include <qapplication.h>
+#include <qoperatingsystemversion.h>
 #if QT_CONFIG(statusbar)
 #include <qstatusbar.h>
 #endif
@@ -475,13 +476,13 @@ void QDockWidgetGroupWindow::adjustFlags()
     if (!top) { // nested tabs, show window decoration
         flags =
             ((oldFlags & ~Qt::FramelessWindowHint) | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
-    } else if (static_cast<QDockWidgetGroupLayout *>(layout())->nativeWindowDeco()) {
+    } else if (static_cast<QDockWidgetGroupLayout *>(layout())->nativeWindowDeco() ||
+               QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10) {
         flags |= Qt::CustomizeWindowHint | Qt::WindowTitleHint;
         flags.setFlag(Qt::WindowCloseButtonHint, top->features() & QDockWidget::DockWidgetClosable);
         flags &= ~Qt::FramelessWindowHint;
     } else {
-        flags &= ~(Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
-        flags |= Qt::FramelessWindowHint;
+        flags = Qt::Tool | Qt::CustomizeWindowHint;
     }
 
     if (oldFlags != flags) {
