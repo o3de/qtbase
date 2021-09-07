@@ -2567,7 +2567,9 @@ void QMenuPrivate::popup(const QPoint &p, QAction *atAction, PositionFunction po
     const int hPlacementOffset = q->style()->pixelMetric(QStyle::PM_MenuHPlacementOffset, nullptr, q);
     const int vPlacementOffset = q->style()->pixelMetric(QStyle::PM_MenuVPlacementOffset, nullptr, q);
     pos.rx() += q->isRightToLeft() ? -hPlacementOffset : hPlacementOffset;
-    pos.ry() += vPlacementOffset;
+    // Vertical offset is already correct for submenus
+    if (!caused)
+        pos.ry() += vPlacementOffset;
 
     q->setGeometry(QRect(pos, size));
 #if QT_CONFIG(effects)
