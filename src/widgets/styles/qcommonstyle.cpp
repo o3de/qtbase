@@ -4749,6 +4749,8 @@ int QCommonStyle::pixelMetric(PixelMetric m, const QStyleOption *opt, const QWid
     case PM_MenuDesktopFrameWidth:
     case PM_MenuHMargin:
     case PM_MenuVMargin:
+    case PM_MenuHPlacementOffset:
+    case PM_MenuVPlacementOffset:
         ret = 0;
         break;
 

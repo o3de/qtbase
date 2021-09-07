@@ -1450,6 +1450,10 @@ void QStyle::drawItemPixmap(QPainter *painter, const QRect &rect, int alignment,
     \value PM_MenuScrollerHeight  Height of the scroller area in a QMenu.
     \value PM_MenuTearoffHeight  Height of a tear off area in a QMenu.
     \value PM_MenuDesktopFrameWidth The frame width for the menu on the desktop.
+    \value PM_MenuHPlacementOffset Horizontal offset to move the actual painting
+        area of the menu by. To compensate for e.g. shadow outline.
+    \value PM_MenuVPlacementOffset Vertical offset to move the actual painting
+        area of the menu by. To compensate for e.g. shadow outline.
 
     \omitvalue PM_DialogButtonsSeparator
     \omitvalue PM_DialogButtonsButtonWidth

@@ -502,6 +502,8 @@ public:
         PM_MenuPanelWidth,
         PM_MenuTearoffHeight,
         PM_MenuDesktopFrameWidth,
+        PM_MenuHPlacementOffset,
+        PM_MenuVPlacementOffset,
 
         PM_MenuBarPanelWidth,
         PM_MenuBarItemSpacing,
