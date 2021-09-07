@@ -227,6 +227,7 @@ public:
     QHash<const QWidget *, Tampered<QPalette>> customPaletteWidgets;
     QHash<const QWidget *, Tampered<QFont>> customFontWidgets;
     QHash<const QWidget *, PropertyRollback::List> propertyRollbacks;
+    QHash<const char*, QString> classNames;
 };
 template <typename T>
 class QTypeInfo<QStyleSheetStyleCaches::Tampered<T>>

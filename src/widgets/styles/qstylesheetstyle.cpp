@@ -1519,6 +1519,19 @@ public:
         } while (metaObject != nullptr);
         return result;
     }
+    QString lookupClassName(const QMetaObject* obj, bool doReplace) const
+    {
+        const char* className = obj->className();
+        auto classIt = styleSheetCaches->classNames.find(className);
+        if (classIt != styleSheetCaches->classNames.end()) {
+            return *classIt;
+        }
+        QString classNameStr = QString::fromLatin1(obj->className());
+        if (doReplace && classNameStr.contains(QLatin1Char(':')))
+            classNameStr.replace(QLatin1Char(':'), QLatin1Char('-'));
+        styleSheetCaches->classNames[className] = classNameStr;
+        return classNameStr;
+    }
     QString attribute(NodePtr node, const QString& name) const override
     {
         if (isNullNode(node))
@@ -1533,16 +1546,14 @@ public:
         QVariant value = obj->property(name.toLatin1());
         if (!value.isValid()) {
             if (name == QLatin1String("class")) {
-                QString className = QString::fromLatin1(obj->metaObject()->className());
-                if (className.contains(QLatin1Char(':')))
-                    className.replace(QLatin1Char(':'), QLatin1Char('-'));
+                QString className = lookupClassName(obj->metaObject(), true);
                 cache[name] = className;
                 return className;
             } else if (name == QLatin1String("style")) {
                 QWidget *w = qobject_cast<QWidget *>(obj);
                 QStyleSheetStyle *proxy = w ? qt_styleSheet(w->style()) : nullptr;
                 if (proxy) {
-                    QString styleName = QString::fromLatin1(proxy->baseStyle()->metaObject()->className());
+                    QString styleName = lookupClassName(proxy->baseStyle()->metaObject(), false);
                     cache[name] = styleName;
                     return styleName;
                 }
