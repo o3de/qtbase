@@ -272,7 +272,9 @@ static NSString *qt_mac_removePrivateUnicode(NSString *string)
             accel_ev.ignore();
             QCoreApplication::sendEvent(object, &accel_ev);
             if (accel_ev.isAccepted()) {
-                [[NSApp keyWindow] sendEvent:event];
+                QKeyEvent keypress_ev(QEvent::KeyPress, (keyCode & (~Qt::KeyboardModifierMask)),
+                               Qt::KeyboardModifiers(modifiers & Qt::KeyboardModifierMask));
+                QCoreApplication::sendEvent(object, &keypress_ev);
                 *target = nil;
                 *action = nil;
                 return YES;
