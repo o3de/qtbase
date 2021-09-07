@@ -2574,6 +2574,12 @@ QStyle *QWidget::style() const
 
     if (d->extra && d->extra->style)
         return d->extra->style;
+
+    if (QApplication::testAttribute(Qt::AA_PropagateStyleToChildren)) {
+        if (auto parent = parentWidget())
+            return parent->style();
+    }
+
     return QApplication::style();
 }
 

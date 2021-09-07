@@ -553,8 +553,8 @@ public:
         AA_DontShowShortcutsInContextMenus = 28,
         AA_CompressTabletEvents = 29,
         AA_DisableWindowContextHelpButton = 30, // ### Qt 6: remove me
-        AA_DisableSessionManager = 31,
-
+        AA_DisableSessionManager = 31,        AA_PropagateStyleToChildren = 32, /// ### Qt6: Make it a widget attribute instead of app. That implies harmonizing it with the stylesheet propagation machinery, which is welcome.
+                                          //           Ideally there should be no stylesheet-specific paths.
         // Add new attributes before this line
         AA_AttributeCount
     };

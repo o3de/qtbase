@@ -93,6 +93,7 @@ private slots:
 
     void testProxyCalled();
     void testStyleOptionInit();
+    void testPropagateToChildren();
 private:
     bool testAllFunctions(QStyle *);
     bool testScrollBarSubControls(const QStyle *style);
@@ -718,6 +719,25 @@ void tst_QStyle::testStyleOptionInit()
         testAllFunctions(style);
         QVERIFY(!testStyle.invalidOptionsDetected);
     }
+}
+
+void tst_QStyle::testPropagateToChildren()
+{
+    QWidget w1;
+    QWidget w2(&w1);
+    QCOMPARE(w1.style(), qApp->style());
+    QCOMPARE(w2.style(), qApp->style());
+
+    qApp->setAttribute(Qt::AA_PropagateStyleToChildren);
+    CustomProxy s;
+    w1.setStyle(&s);
+
+    QCOMPARE(w1.style(), &s);
+    QCOMPARE(w2.style(), &s);
+
+    qApp->setAttribute(Qt::AA_PropagateStyleToChildren, false);
+    QCOMPARE(w1.style(), &s);
+    QCOMPARE(w2.style(), qApp->style());
 }
 
 QTEST_MAIN(tst_QStyle)

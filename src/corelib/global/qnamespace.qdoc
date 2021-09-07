@@ -299,6 +299,8 @@
            Currently supported on the Windows platform only.
            This value was added in 5.15
 
+    \value AA_PropagateStyleToChildren When widgets don't have any style set they will use
+           their parent's style, instead of falling back to QApplication's style.
     The following values are deprecated or obsolete:
 
     \value AA_ImmediateWidgetCreation This attribute is no longer fully
