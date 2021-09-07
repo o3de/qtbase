@@ -377,7 +377,11 @@ QT_DEFINE_QPA_EVENT_HANDLER(bool, handleMouseEvent, QWindow *window, const QPoin
 QT_DEFINE_QPA_EVENT_HANDLER(bool, handleMouseEvent, QWindow *window, ulong timestamp, const QPointF &local, const QPointF &global, Qt::MouseButtons b,
                                               Qt::KeyboardModifiers mods, Qt::MouseEventSource source)
 {
-    return handleMouseEvent<Delivery>(window, timestamp, local, global, b, Qt::NoButton, QEvent::None, mods, source);
+    QScreen *screen = window->screen();
+    const QPointF nativeGlobalPixels = screen ? QHighDpi::fromNativePixels(global, screen)
+                                              : QHighDpi::fromNativePixels(global, window);
+
+    return handleMouseEvent<Delivery>(window, timestamp, local, nativeGlobalPixels, b, Qt::NoButton, QEvent::None, mods, source);
 }
 
 bool QWindowSystemInterface::handleFrameStrutMouseEvent(QWindow *window, const QPointF &local, const QPointF &global, Qt::MouseButtons b,
