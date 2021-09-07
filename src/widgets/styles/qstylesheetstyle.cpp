@@ -6227,8 +6227,18 @@ QPixmap QStyleSheetStyle::loadPixmap(const QString &fileName, const QObject *con
             ratio = 1.0;
     }
 
+    const QPair<QString, qreal> cacheKey = {fileName, ratio};
+    QString resolvedFileName;
     qreal sourceDevicePixelRatio = 1.0;
-    QString resolvedFileName = qt_findAtNxFile(fileName, ratio, &sourceDevicePixelRatio);
+    auto cacheIt = styleSheetCaches->pixmapPaths.find(cacheKey);
+    if (cacheIt != styleSheetCaches->pixmapPaths.end()) {
+        resolvedFileName = cacheIt->first;
+        sourceDevicePixelRatio = cacheIt->second;
+    } else {
+        resolvedFileName = qt_findAtNxFile(fileName, ratio, &sourceDevicePixelRatio);
+        styleSheetCaches->pixmapPaths[cacheKey] = {resolvedFileName, sourceDevicePixelRatio};
+    }
+
     QPixmap pixmap(resolvedFileName);
     pixmap.setDevicePixelRatio(sourceDevicePixelRatio);
     return pixmap;

@@ -228,6 +228,7 @@ public:
     QHash<const QWidget *, Tampered<QFont>> customFontWidgets;
     QHash<const QWidget *, PropertyRollback::List> propertyRollbacks;
     QHash<const char*, QString> classNames;
+    QHash<QPair<QString, qreal>, QPair<QString, qreal>> pixmapPaths;
 };
 template <typename T>
 class QTypeInfo<QStyleSheetStyleCaches::Tampered<T>>
