@@ -2011,6 +2011,10 @@ void QStyle::drawItemPixmap(QPainter *painter, const QRect &rect, int alignment,
            disables this feature.
            This enum value has been introduced in Qt 5.12.
 
+    \value SH_ToolTipLabel_TextWrapMode Determines the wordWrap property to apply for tooltips label.
+           This enum value has been introduced in Qt 5.12
+
+
     \sa styleHint()
 */
 

@@ -5415,6 +5415,9 @@ int QCommonStyle::styleHint(StyleHint sh, const QStyleOption *opt, const QWidget
     case SH_SpinBox_StepModifier:
         ret = Qt::ControlModifier;
         break;
+    case SH_ToolTipLabel_TextWrapMode:
+        ret = -1;
+        break;
     default:
         ret = 0;
         break;

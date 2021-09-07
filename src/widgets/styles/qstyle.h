@@ -758,6 +758,7 @@ public:
         SH_SpinBox_ButtonsInsideFrame,
         SH_SpinBox_StepModifier,
         // Add new style hint values here
+        SH_ToolTipLabel_TextWrapMode,
 
         SH_CustomBase = 0xf0000000
     };

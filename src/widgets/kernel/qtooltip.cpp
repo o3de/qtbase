@@ -229,17 +229,39 @@ void  QTipLabel::updateSize(const QPoint &pos)
     // Make it look good with the default ToolTip font on Mac, which has a small descent.
     if (fm.descent() == 2 && fm.ascent() >= 11)
         ++extra.rheight();
-    setWordWrap(Qt::mightBeRichText(text()));
+    const int hint = style()->styleHint(QStyle::SH_ToolTipLabel_TextWrapMode);
+    const bool richText = Qt::mightBeRichText(text());
+    bool wrap = richText;
+    if (hint != -1) {
+        const QTextOption::WrapMode mode = static_cast<QTextOption::WrapMode>(hint);
+        switch (mode) {
+        case QTextOption::NoWrap:
+        case QTextOption::ManualWrap:
+            wrap = false;
+            break;
+        case QTextOption::WordWrap:
+        case QTextOption::WrapAnywhere:
+        case QTextOption::WrapAtWordBoundaryOrAnywhere:
+            wrap = true;
+            break;
+        }
+    }
+    setWordWrap(wrap);
     QSize sh = sizeHint();
     // ### When the above WinRT code is fixed, windowhandle should be used to find the screen.
     QScreen *screen = QGuiApplication::screenAt(pos);
     if (!screen)
         screen = QGuiApplication::primaryScreen();
     if (screen) {
-        const qreal screenWidth = screen->geometry().width();
-        if (!wordWrap() && sh.width() > screenWidth) {
-            setWordWrap(true);
-            sh = sizeHint();
+        const QRect screenRect = screen->geometry();
+        if (sh.width() > screenRect.width()) {
+            if (wrap) {
+                sh.setWidth(screenRect.width() * .8);
+                sh.setHeight(heightForWidth(sh.width()));
+            } else {
+                setWordWrap(true);
+                sh = sizeHint();
+            }
         }
     }
     resize(sh + extra);
