@@ -3086,7 +3086,16 @@ void QDockAreaLayout::addDockWidget(QInternal::DockPosition pos, QDockWidget *do
         info.o = orientation;
 
         QDockAreaLayoutItem new_item(dockWidgetItem);
-        info.item_list.append(new_item);
+
+        if (pos == QInternal::LeftDock || pos == QInternal::TopDock)
+        {
+            info.item_list.prepend(new_item);
+        }
+        else
+        {
+            info.item_list.append(new_item);
+        }
+
 #if QT_CONFIG(tabbar)
         if (info.tabbed && !new_item.skip()) {
             info.updateTabBar();
@@ -3100,8 +3109,18 @@ void QDockAreaLayout::addDockWidget(QInternal::DockPosition pos, QDockWidget *do
         int tbshape = 0;
 #endif
         QDockAreaLayoutInfo new_info(&sep, pos, orientation, tbshape, mainWindow);
-        new_info.item_list.append(QDockAreaLayoutItem(new QDockAreaLayoutInfo(info)));
-        new_info.item_list.append(QDockAreaLayoutItem(dockWidgetItem));
+
+        if (pos == QInternal::LeftDock || pos == QInternal::TopDock)
+        {
+            new_info.item_list.append(QDockAreaLayoutItem(dockWidgetItem));
+            new_info.item_list.append(QDockAreaLayoutItem(new QDockAreaLayoutInfo(info)));
+        }
+        else
+        {
+            new_info.item_list.append(QDockAreaLayoutItem(new QDockAreaLayoutInfo(info)));
+            new_info.item_list.append(QDockAreaLayoutItem(dockWidgetItem));
+        }
+
         info = new_info;
     }
 
