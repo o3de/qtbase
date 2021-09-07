@@ -3777,7 +3777,6 @@ void QStyleSheetStyle::drawControl(ControlElement ce, const QStyleOption *opt, Q
                     QRect pmr(0, 0, pixw, pixh);
                     pmr.moveCenter(iconRect.center());
                     p->drawPixmap(pmr.topLeft(), pixmap);
-                    textRectOffset = m->maxIconWidth;
                 } else if (checkable) {
                     QRenderRule subSubRule = renderRule(w, opt, PseudoElement_MenuCheckMark);
                     const QRect cmRect = positionRect(w, subRule, subSubRule, PseudoElement_MenuCheckMark, opt->rect, opt->direction);
