@@ -548,17 +548,31 @@ void QRollEffect::scroll()
                 setFocus();
 #endif
                 widget->hide();
+                q_roll = 0;
+                deleteLater();
             } else {
                 //Since we are faking the visibility of the widget
                 //we need to unset the hidden state on it before calling show
                 widget->setAttribute(Qt::WA_WState_Hidden, true);
                 widget->show();
+#ifndef Q_OS_WIN
                 lower();
+                q_roll = 0;
+                deleteLater();
+#else
+                // Delay deleting the QRollEffect for a frame or so to prevent
+                // flickering when displaying the popup.
+                QTimer::singleShot(16, this, [&] {
+                    q_roll = 0;
+                    deleteLater();
+                });
+#endif
             }
-        }
+        } else {
         q_roll = nullptr;
         deleteLater();
     }
+}
 }
 
 /*!
