@@ -2663,8 +2663,16 @@ void QWidgetPrivate::setStyle_helper(QStyle *newStyle, bool propagate)
 #endif
 }
 
+static QString completeStylesheet(const QWidget *w)
+{
+    if (!w)
+        return QString();
+
+    return w->styleSheet() + completeStylesheet(w->parentWidget());
+}
+
 // Inherits style from the current parent and propagates it as necessary
-void QWidgetPrivate::inheritStyle()
+void QWidgetPrivate::inheritStyle(bool accumulatedStylesheetChanged)
 {
 #ifndef QT_NO_STYLE_STYLESHEET
     Q_Q(QWidget);
@@ -2675,6 +2683,7 @@ void QWidgetPrivate::inheritStyle()
 
     if (!q->styleSheet().isEmpty()) {
         Q_ASSERT(proxy);
+        if (accumulatedStylesheetChanged)
         proxy->repolish(q);
         return;
     }
@@ -2691,6 +2700,8 @@ void QWidgetPrivate::inheritStyle()
         else if (QStyleSheetStyle *newProxy = qt_styleSheet(parentStyle))
             newProxy->ref();
 
+        // Only if stylesheet changed, or QStyle changed we repolish()
+        if (accumulatedStylesheetChanged || newStyle != (extra ? extra->style : nullptr))
         setStyle_helper(newStyle, true);
         return;
     }
@@ -10414,6 +10425,8 @@ void QWidget::setParent(QWidget *parent, Qt::WindowFlags f)
     if (newParent && isAncestorOf(focusWidget()))
         focusWidget()->clearFocus();
 
+    const QString oldStyleSheet = completeStylesheet(this);
+
     d->setParent_sys(parent, f);
 
     if (desktopWidget)
@@ -10474,7 +10487,10 @@ void QWidget::setParent(QWidget *parent, Qt::WindowFlags f)
             if (!testAttribute(Qt::WA_ForceUpdatesDisabled))
                 d->setUpdatesEnabled_helper(parent ? parent->updatesEnabled() : true);
         }
-        d->inheritStyle();
+
+        // If the stylesheet didn't change, don't waste cpu recalculating stylesheet rules
+        const bool accumulatedStylesheetChanged = oldStyleSheet != completeStylesheet(this);
+        d->inheritStyle(accumulatedStylesheetChanged);
 
         // send and post remaining QObject events
         if (parent && d->sendChildEvents) {
