@@ -628,12 +628,43 @@ void QSslSocketBackendPrivate::transmit()
 
 QList<QSslError> (QSslSocketBackendPrivate::verify)(QList<QSslCertificate> certificateChain, const QString &hostName)
 {
-    Q_UNIMPLEMENTED();
-    Q_UNUSED(certificateChain)
-    Q_UNUSED(hostName)
-
     QList<QSslError> errors;
-    errors << QSslError(QSslError::UnspecifiedError);
+    if (QSslCertificatePrivate::isBlacklisted(certificateChain[0])) {
+        QSslError error(QSslError::CertificateBlacklisted, certificateChain[0]);
+        errors << error;
+    }
+
+    // Check the certificate name against the hostname if one was specified
+    if ((!hostName.isEmpty()) && (!isMatchingHostname(certificateChain[0], hostName))) {
+        // No matches in common names or alternate names.
+        QSslError error(QSslError::HostNameMismatch, certificateChain[0]);
+        errors << error;
+    }
+
+    QCFType<CFMutableArrayRef> certArray = CFArrayCreateMutable(NULL, 0, &kCFTypeArrayCallBacks);
+    for (const QSslCertificate &cert : qAsConst(certificateChain)) {
+        QCFType<CFDataRef> certData = cert.d->derData.toCFData();
+        QCFType<SecCertificateRef> certRef = SecCertificateCreateWithData(NULL, certData);
+        CFArrayAppendValue(certArray, certRef);
+    }
+
+    QCFType<SecTrustRef> trust;
+    QCFType<SecPolicyRef> policy = SecPolicyCreateBasicX509();
+    OSStatus status = SecTrustCreateWithCertificates(certArray, policy, &trust);
+
+    switch (status) {
+    case errSecSuccess:
+        break;
+    default:
+        errors << QSslError(QSslError::UnspecifiedError);
+        break;
+    }
+
+    SecTrustResultType res = kSecTrustResultInvalid;
+    status = SecTrustEvaluate(trust, &res);
+    if (status != noErr) {
+        errors << QSslError(QSslError::UnspecifiedError);
+    }
 
     return errors;
 }
