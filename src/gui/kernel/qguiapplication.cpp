@@ -1215,6 +1215,9 @@ static void init_platform(const QString &pluginNamesWithArguments, const QString
         // Split into platform name and arguments
         QStringList arguments = pluginArgument.split(QLatin1Char(':'));
         const QString name = arguments.takeFirst().toLower();
+        // Separate the comma separated arguments list, if it has been supplied
+        if (!arguments.isEmpty())
+            arguments = arguments.takeFirst().split(QLatin1Char(','));
         QString argumentsKey = name;
         argumentsKey[0] = argumentsKey.at(0).toUpper();
         arguments.append(QLibraryInfo::platformPluginArguments(argumentsKey));
