@@ -1776,6 +1776,7 @@ void QWindowsWindow::setParent_sys(const QPlatformWindow *parent)
             setDropSiteEnabled(false);
             setWindowFlags_sys(window()->flags(), unsigned(isTopLevel ? WindowCreationData::ForceTopLevel : WindowCreationData::ForceChild));
             updateDropSite(isTopLevel);
+            updateFullFrameMargins();
         }
     }
 }
