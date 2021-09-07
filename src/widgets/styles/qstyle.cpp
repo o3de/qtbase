@@ -2475,6 +2475,18 @@ bool QStylePrivate::useFullScreenForPopup()
     return theme && theme->themeHint(QPlatformTheme::UseFullScreenForPopupMenu).toBool();
 }
 
+static bool s_minimizePolishOptimizations = false;
+
+void QStyle::enableMinimizePolishOptimizations(bool enabled)
+{
+    s_minimizePolishOptimizations = enabled;
+}
+
+bool QStyle::minimizePolishOptimizationsEnabled()
+{
+    return s_minimizePolishOptimizations;
+}
+
 QT_END_NAMESPACE
 
 #include "moc_qstyle.cpp"

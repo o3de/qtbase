@@ -73,6 +73,9 @@ public:
     QStyle();
     virtual ~QStyle();
 
+    static void enableMinimizePolishOptimizations(bool enabled);
+    static bool minimizePolishOptimizationsEnabled();
+
     virtual void polish(QWidget *widget);
     virtual void unpolish(QWidget *widget);
 

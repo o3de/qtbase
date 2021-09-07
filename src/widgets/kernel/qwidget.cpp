@@ -2672,7 +2672,7 @@ static QString completeStylesheet(const QWidget *w)
 }
 
 // Inherits style from the current parent and propagates it as necessary
-void QWidgetPrivate::inheritStyle(bool accumulatedStylesheetChanged)
+void QWidgetPrivate::inheritStyle(bool repolish)
 {
 #ifndef QT_NO_STYLE_STYLESHEET
     Q_Q(QWidget);
@@ -2683,7 +2683,7 @@ void QWidgetPrivate::inheritStyle(bool accumulatedStylesheetChanged)
 
     if (!q->styleSheet().isEmpty()) {
         Q_ASSERT(proxy);
-        if (accumulatedStylesheetChanged)
+        if (repolish)
         proxy->repolish(q);
         return;
     }
@@ -2701,7 +2701,7 @@ void QWidgetPrivate::inheritStyle(bool accumulatedStylesheetChanged)
             newProxy->ref();
 
         // Only if stylesheet changed, or QStyle changed we repolish()
-        if (accumulatedStylesheetChanged || newStyle != (extra ? extra->style : nullptr))
+        if (repolish || newStyle != (extra ? extra->style : nullptr))
         setStyle_helper(newStyle, true);
         return;
     }
@@ -10425,7 +10425,8 @@ void QWidget::setParent(QWidget *parent, Qt::WindowFlags f)
     if (newParent && isAncestorOf(focusWidget()))
         focusWidget()->clearFocus();
 
-    const QString oldStyleSheet = completeStylesheet(this);
+    // (don't call completeStylesheet(this) when we're not using the polish optimization)
+    const QString oldStyleSheet = QStyle::minimizePolishOptimizationsEnabled() ? completeStylesheet(this) : QString();
 
     d->setParent_sys(parent, f);
 
@@ -10488,9 +10489,10 @@ void QWidget::setParent(QWidget *parent, Qt::WindowFlags f)
                 d->setUpdatesEnabled_helper(parent ? parent->updatesEnabled() : true);
         }
 
-        // If the stylesheet didn't change, don't waste cpu recalculating stylesheet rules
-        const bool accumulatedStylesheetChanged = oldStyleSheet != completeStylesheet(this);
-        d->inheritStyle(accumulatedStylesheetChanged);
+        // If the stylesheet didn't change, don't waste cpu recalculating stylesheet rules.
+        // But only use this if useMinimizePolishOptimization is set. By default stylesheet rules will be recalculated.
+        const bool repolish = !QStyle::minimizePolishOptimizationsEnabled() || oldStyleSheet != completeStylesheet(this);
+        d->inheritStyle(repolish);
 
         // send and post remaining QObject events
         if (parent && d->sendChildEvents) {

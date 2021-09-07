@@ -327,7 +327,7 @@ public:
     void resolveLocale();
 
     void setStyle_helper(QStyle *newStyle, bool propagate);
-    void inheritStyle(bool accumulatedStylesheetChanged = true);
+    void inheritStyle(bool repolish = true);
 
     void setUpdatesEnabled_helper(bool );
 
