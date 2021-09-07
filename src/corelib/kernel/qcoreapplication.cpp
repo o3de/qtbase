@@ -359,7 +359,7 @@ QAbstractEventDispatcher *QCoreApplicationPrivate::eventDispatcher = nullptr;
 #endif // QT_NO_QOBJECT
 
 QCoreApplication *QCoreApplication::self = nullptr;
-uint QCoreApplicationPrivate::attribs =
+quint64 QCoreApplicationPrivate::attribs =
     (1 << Qt::AA_SynthesizeMouseForUnhandledTouchEvents) |
     (1 << Qt::AA_SynthesizeMouseForUnhandledTabletEvents);
 
@@ -949,9 +949,9 @@ bool QCoreApplication::isSetuidAllowed()
 void QCoreApplication::setAttribute(Qt::ApplicationAttribute attribute, bool on)
 {
     if (on)
-        QCoreApplicationPrivate::attribs |= 1 << attribute;
+        QCoreApplicationPrivate::attribs |= 1ULL << attribute;
     else
-        QCoreApplicationPrivate::attribs &= ~(1 << attribute);
+        QCoreApplicationPrivate::attribs &= ~(1ULL << attribute);
 #if defined(QT_NO_QOBJECT)
     if (Q_UNLIKELY(qApp)) {
 #else

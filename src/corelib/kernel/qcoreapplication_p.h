@@ -186,8 +186,8 @@ public:
 #endif
 
     static bool setuidAllowed;
-    static uint attribs;
-    static inline bool testAttribute(uint flag) { return attribs & (1 << flag); }
+    static quint64 attribs;
+    static inline bool testAttribute(uint flag) { return attribs & (1ULL << flag); }
     static int app_compile_version;
 
     void processCommandLineArguments();
