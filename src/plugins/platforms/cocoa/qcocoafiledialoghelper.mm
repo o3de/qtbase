@@ -386,9 +386,13 @@ static QString strippedText(QString s)
         QString filename = QString::fromNSString([[mSavePanel URL] path]).normalized(QString::NormalizationForm_C);
         const QString defaultSuffix = mOptions->defaultSuffix();
         const QFileInfo fileInfo(filename);
+        const QString selectedFilterSuffix = mNameFilterDropDownList->value([mPopUpButton indexOfSelectedItem]);
+        if (fileInfo.suffix().isEmpty() && !selectedFilterSuffix.isEmpty()) {
+            filename.append('.').append(selectedFilterSuffix);
+        }
         // If neither the user or the NSSavePanel have provided a suffix, use
         // the default suffix (if it exists).
-        if (fileInfo.suffix().isEmpty() && !defaultSuffix.isEmpty()) {
+        else if (fileInfo.suffix().isEmpty() && !defaultSuffix.isEmpty()) {
                 filename.append('.').append(defaultSuffix);
         }
         result << QUrl::fromLocalFile(filename.remove(QLatin1String("___qt_very_unlikely_prefix_")));
