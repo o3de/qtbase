@@ -2,3 +2,4 @@
 .gitignore              export-ignore
 .gitattributes          export-ignore
 .commit-template        export-ignore
+configure               text eol=lf
