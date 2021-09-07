@@ -179,6 +179,19 @@ private:
     Q_DECLARE_PRIVATE(QStyleSheetStyle)
 };
 
+struct PropertyRollback
+{
+    typedef QVector<PropertyRollback> List;
+    void rollback()
+    {
+        widget->setProperty(propertyName, oldValue);
+    }
+
+    QWidget *widget;
+    QByteArray propertyName;
+    QVariant oldValue;
+};
+
 class QStyleSheetStyleCaches : public QObject
 {
     Q_OBJECT
@@ -213,6 +226,7 @@ public:
     };
     QHash<const QWidget *, Tampered<QPalette>> customPaletteWidgets;
     QHash<const QWidget *, Tampered<QFont>> customFontWidgets;
+    QHash<const QWidget *, PropertyRollback::List> propertyRollbacks;
 };
 template <typename T>
 class QTypeInfo<QStyleSheetStyleCaches::Tampered<T>>

@@ -2627,6 +2627,8 @@ void QStyleSheetStyle::setProperties(QWidget *w)
         }
 
         w->setProperty(propertyL1, v);
+
+        styleSheetCaches->propertyRollbacks[w].push_back( { w, property.toLatin1(), v });
     }
 }
 
@@ -2801,6 +2803,7 @@ void QStyleSheetStyleCaches::objectDestroyed(QObject *o)
     customFontWidgets.remove(static_cast<QWidget *>(o));
     styleSheetCache.remove(o);
     autoFillDisabledWidgets.remove((const QWidget *)o);
+    propertyRollbacks.remove((const QWidget *)o);
 }
 
 void QStyleSheetStyleCaches::styleDestroyed(QObject *o)
@@ -2963,6 +2966,13 @@ void QStyleSheetStyle::unpolish(QWidget *w)
     styleSheetCaches->renderRulesCache.remove(w);
     styleSheetCaches->styleSheetCache.remove(w);
     unsetPalette(w);
+
+    const auto &propertyRollbacks = styleSheetCaches->propertyRollbacks.value(w);
+    for (PropertyRollback rollback : propertyRollbacks)
+        rollback.rollback();
+
+    styleSheetCaches->propertyRollbacks.remove(w);
+
     setGeometry(w);
     w->setAttribute(Qt::WA_StyleSheetTarget, false);
     w->setAttribute(Qt::WA_StyleSheet, false);
