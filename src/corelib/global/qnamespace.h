@@ -1768,6 +1768,15 @@ public:
         ChecksumItuV41
     };
 
+    enum class HighDpiScaleFactorRoundingPolicy {
+        Unset,
+        Round,
+        Ceil,
+        Floor,
+        RoundPreferFloor,
+        PassThrough
+    };
+
     // QTBUG-48701
     enum ReturnByValueConstant { ReturnByValue }; // ### Qt 7: Remove me
 
@@ -1857,6 +1866,7 @@ public:
     QT_Q_ENUM(MouseEventSource)
     QT_Q_FLAG(MouseEventFlag)
     QT_Q_ENUM(ChecksumType)
+    QT_Q_ENUM(HighDpiScaleFactorRoundingPolicy)
     QT_Q_ENUM(TabFocusBehavior)
 #endif // Q_DOC
 
