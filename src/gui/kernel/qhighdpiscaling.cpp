@@ -487,7 +487,7 @@ void QHighDpiScaling::initHighDpiScaling()
 
     m_pixelDensityScalingActive = false; //set in updateHighDpiScaling below
 
-    m_active = m_globalScalingActive || m_usePixelDensity;
+    m_active = m_globalScalingActive || m_screenFactorSet || m_usePixelDensity;
 }
 
 void QHighDpiScaling::updateHighDpiScaling()
